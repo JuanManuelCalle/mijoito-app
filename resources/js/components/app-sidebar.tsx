@@ -14,7 +14,7 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Todos',
+        title: 'Pokemons',
         url: '/pokemons',
         icon: BookCheck,
     },
