@@ -39,13 +39,6 @@ import {
 import { ChevronDownIcon, ChevronUpIcon, ExternalLinkIcon, SearchIcon } from "lucide-react";
 import { usePost } from "@/hooks/usePost";
 
-declare module "@tanstack/react-table" {
-  //allows us to define custom properties for our columns
-  interface ColumnMeta<TData extends RowData, TValue> {
-    filterVariant?: "text" | "range" | "select";
-  }
-}
-
 type Item = {
   name: string;
   url: string;
@@ -89,7 +82,7 @@ export const DataTable = () => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([
     {
-      id: "name",
+      id: "traffic",
       desc: false,
     },
   ]);
@@ -225,89 +218,7 @@ export const DataTable = () => {
 function Filter({ column }: { column: Column<any, unknown> }) {
   const id = useId();
   const columnFilterValue = column.getFilterValue();
-  const { filterVariant } = column.columnDef.meta ?? {};
   const columnHeader = typeof column.columnDef.header === "string" ? column.columnDef.header : "";
-  const sortedUniqueValues = useMemo(() => {
-    if (filterVariant === "range") return [];
-
-    // Get all unique values from the column
-    const values = Array.from(column.getFacetedUniqueValues().keys());
-
-    // If the values are arrays, flatten them and get unique items
-    const flattenedValues = values.reduce((acc: string[], curr) => {
-      if (Array.isArray(curr)) {
-        return [...acc, ...curr];
-      }
-      return [...acc, curr];
-    }, []);
-
-    // Get unique values and sort them
-    return Array.from(new Set(flattenedValues)).sort();
-  }, [column.getFacetedUniqueValues(), filterVariant]);
-
-  if (filterVariant === "range") {
-    return (
-      <div className="*:not-first:mt-2">
-        <Label>{columnHeader}</Label>
-        <div className="flex">
-          <Input
-            id={`${id}-range-1`}
-            className="flex-1 rounded-e-none [-moz-appearance:_textfield] focus:z-10 [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
-            value={(columnFilterValue as [number, number])?.[0] ?? ""}
-            onChange={(e) =>
-              column.setFilterValue((old: [number, number]) => [
-                e.target.value ? Number(e.target.value) : undefined,
-                old?.[1],
-              ])
-            }
-            placeholder="Min"
-            type="number"
-            aria-label={`${columnHeader} min`}
-          />
-          <Input
-            id={`${id}-range-2`}
-            className="-ms-px flex-1 rounded-s-none [-moz-appearance:_textfield] focus:z-10 [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
-            value={(columnFilterValue as [number, number])?.[1] ?? ""}
-            onChange={(e) =>
-              column.setFilterValue((old: [number, number]) => [
-                old?.[0],
-                e.target.value ? Number(e.target.value) : undefined,
-              ])
-            }
-            placeholder="Max"
-            type="number"
-            aria-label={`${columnHeader} max`}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  if (filterVariant === "select") {
-    return (
-      <div className="*:not-first:mt-2">
-        <Label htmlFor={`${id}-select`}>{columnHeader}</Label>
-        <Select
-          value={columnFilterValue?.toString() ?? "all"}
-          onValueChange={(value) => {
-            column.setFilterValue(value === "all" ? undefined : value);
-          }}
-        >
-          <SelectTrigger id={`${id}-select`}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            {sortedUniqueValues.map((value) => (
-              <SelectItem key={String(value)} value={String(value)}>
-                {String(value)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-    );
-  }
 
   return (
     <div className="*:not-first:mt-2">
