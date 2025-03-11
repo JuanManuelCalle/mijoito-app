@@ -72,7 +72,7 @@ const frameworks: Option[] = [
 ];
 
 export default function Component() {
-  const id = useId();
+
   return (
     <div className="*:not-first:mt-2">
       <Label>Multiselect</Label>
