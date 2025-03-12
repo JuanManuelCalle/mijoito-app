@@ -55,17 +55,7 @@ function Calendar({
     {} as typeof defaultClassNames,
   );
 
-  const defaultComponents = {
-    Chevron: (props: any) => {
-      if (props.orientation === "left") {
-        return <ChevronLeftIcon size={16} {...props} aria-hidden="true" />;
-      }
-      return <ChevronRightIcon size={16} {...props} aria-hidden="true" />;
-    },
-  };
-
   const mergedComponents = {
-    ...defaultComponents,
     ...userComponents,
   };
 

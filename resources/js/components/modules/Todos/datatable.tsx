@@ -215,7 +215,7 @@ export const DataTable = () => {
   );
 }
 
-function Filter({ column }: { column: Column<any, unknown> }) {
+function Filter({ column }: { column: Column<Item> }) {
   const id = useId();
   const columnFilterValue = column.getFilterValue();
   const columnHeader = typeof column.columnDef.header === "string" ? column.columnDef.header : "";

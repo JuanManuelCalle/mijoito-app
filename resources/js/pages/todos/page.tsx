@@ -1,3 +1,4 @@
+import { DatePicker } from '@/components/modules/Register/DatePicker';
 import {DataTable} from '@/components/modules/Todos/datatable';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
@@ -15,6 +16,7 @@ export default function TodosPage() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Todos" />
             <DataTable />
+            <DatePicker />
         </AppLayout>
     );
 }
