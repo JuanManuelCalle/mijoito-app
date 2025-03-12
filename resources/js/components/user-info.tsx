@@ -2,7 +2,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export function UserInfo () {
 
-
     return (
         <>
             <Avatar className="h-8 w-8 overflow-hidden rounded-full">
