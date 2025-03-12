@@ -9,8 +9,8 @@ interface Pokemon {
     results: PokemonResult[];
 }
 
-const fetchPost = async (): Promise<PokemonResult[]> => {
-    const response = await fetch('https://pokeapi.co/api/v2/pokemon?offset=20&limit=50');
+const fetchPokemons = async (): Promise<PokemonResult[]> => {
+    const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=2000&offset=0');
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
@@ -18,10 +18,16 @@ const fetchPost = async (): Promise<PokemonResult[]> => {
     return data.results;
 };
 
-export const usePost = () => {
-    return useQuery<PokemonResult[]>({
+export const usePokemon = () => {
+    const query = useQuery<PokemonResult[]>({
         queryKey: ['pokemon'],
-        queryFn: fetchPost,
+        queryFn: fetchPokemons,
         initialData: [], 
     });
+    
+    return {
+        data: query.data,
+        isFetching: query.isFetching,
+    };
 };
+

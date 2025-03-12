@@ -38,12 +38,15 @@ import {
 } from "@tanstack/react-table";
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { usePokemon } from "@/hooks/usePost";
-
 
 type Item = {
+  id: string;
   name: string;
-  url: string;
+  email: string;
+  location: string;
+  flag: string;
+  status: "Active" | "Inactive" | "Pending";
+  balance: number;
 };
 
 const columns: ColumnDef<Item>[] = [
@@ -55,7 +58,7 @@ const columns: ColumnDef<Item>[] = [
           table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
+        aria-label="Select all rows"
       />
     ),
     cell: ({ row }) => (
@@ -65,23 +68,60 @@ const columns: ColumnDef<Item>[] = [
         aria-label="Select row"
       />
     ),
+    size: 28,
+    enableSorting: false,
   },
   {
     header: "Name",
     accessorKey: "name",
     cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
+    size: 180,
   },
   {
-    header: "URL",
-    accessorKey: "url",
-    cell: ({ row }) => <div className="font-medium">{row.getValue("url")}</div>,
-  }
+    header: "Email",
+    accessorKey: "email",
+    size: 200,
+  },
+  {
+    header: "Location",
+    accessorKey: "location",
+    cell: ({ row }) => (
+      <div>
+        <span className="text-lg leading-none">{row.original.flag}</span> {row.getValue("location")}
+      </div>
+    ),
+    size: 180,
+  },
+  {
+    header: "Status",
+    accessorKey: "status",
+    cell: ({ row }) => (
+      <Badge
+        className={cn(
+          row.getValue("status") === "Inactive" && "bg-muted-foreground/60 text-primary-foreground",
+        )}
+      >
+        {row.getValue("status")}
+      </Badge>
+    ),
+    size: 120,
+  },
+  {
+    header: "Balance",
+    accessorKey: "balance",
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("balance"));
+      const formatted = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+      }).format(amount);
+      return formatted;
+    },
+    size: 120,
+  },
 ];
 
-export const DataTable = () => {
-
-  const {data: pokemon } = usePokemon();
-
+export default function Component() {
   const pageSize = 5;
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -96,8 +136,20 @@ export const DataTable = () => {
     },
   ]);
 
+  const [data, setData] = useState<Item[]>([]);
+  useEffect(() => {
+    async function fetchPosts() {
+      const res = await fetch(
+        "https://res.cloudinary.com/dlzlfasou/raw/upload/users-01_fertyx.json",
+      );
+      const data = await res.json();
+      setData(data);
+    }
+    fetchPosts();
+  }, []);
+
   const table = useReactTable({
-    data: pokemon,
+    data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -139,6 +191,7 @@ export const DataTable = () => {
                           )}
                           onClick={header.column.getToggleSortingHandler()}
                           onKeyDown={(e) => {
+                            // Enhanced keyboard handling for sorting
                             if (
                               header.column.getCanSort() &&
                               (e.key === "Enter" || e.key === " ")
@@ -272,6 +325,7 @@ export const DataTable = () => {
           </Pagination>
         </div>
 
+        {/* Results per page */}
         <div className="flex flex-1 justify-end">
           <Select
             value={table.getState().pagination.pageSize.toString()}
@@ -291,15 +345,6 @@ export const DataTable = () => {
               ))}
             </SelectContent>
           </Select>
-
-          <div className="flex-1 text-sm text-muted-foreground">
-              MOSTANDO del {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} al {" "} 
-              {Math.min(
-                (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
-                table.getFilteredRowModel().rows.length
-              )}{" "}
-              de {table.getFilteredRowModel().rows.length} registros
-            </div>
         </div>
       </div>
       <p className="text-muted-foreground mt-4 text-center text-sm">
