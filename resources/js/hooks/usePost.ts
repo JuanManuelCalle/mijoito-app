@@ -10,7 +10,7 @@ interface Pokemon {
 }
 
 const fetchPokemons = async (): Promise<PokemonResult[]> => {
-    const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=2000&offset=0');
+    const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=9000&offset=0');
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }

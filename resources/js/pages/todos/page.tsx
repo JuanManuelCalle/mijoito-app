@@ -1,5 +1,4 @@
-import { DatePicker } from '@/components/modules/Register/DatePicker';
-import {DataTable} from '@/components/modules/Todos/datatable';
+import Component from '@/components/comp-485';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
@@ -15,8 +14,7 @@ export default function TodosPage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Pokemons" />
-            <DataTable />
-            <DatePicker />
+            <Component />
         </AppLayout>
     );
 }

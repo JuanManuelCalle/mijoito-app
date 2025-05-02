@@ -35,10 +35,14 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  getFilteredRowModel,
+  ColumnMeta,
 } from "@tanstack/react-table";
-import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon } from "lucide-react";
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, TextIcon, LinkIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePokemon } from "@/hooks/usePost";
+import { DataTableFilter } from "@/components/data-table-filter";
+import { filterFn, defineMeta } from "@/lib/filters";
 
 
 type Item = {
@@ -69,11 +73,23 @@ const columns: ColumnDef<Item>[] = [
   {
     header: "Name",
     accessorKey: "name",
+    filterFn: filterFn('text'),
+    meta: defineMeta((row: Item) => row.name, {
+      type: 'text',
+      displayName: 'Name',
+      icon: TextIcon,
+    }) as ColumnMeta<Item, unknown>,
     cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
   },
   {
     header: "URL",
     accessorKey: "url",
+    filterFn: filterFn('text'),
+    meta: defineMeta((row: Item) => row.url, {
+      type: 'text',
+      displayName: 'URL',
+      icon: LinkIcon,
+    }) as ColumnMeta<Item, unknown>,
     cell: ({ row }) => <div className="font-medium">{row.getValue("url")}</div>,
   }
 ];
@@ -82,7 +98,7 @@ export const DataTable = () => {
 
   const {data: pokemon } = usePokemon();
 
-  const pageSize = 5;
+  const pageSize = 25 ;
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -96,11 +112,14 @@ export const DataTable = () => {
     },
   ]);
 
+  const [filtering, setFiltering] = useState<any>([]);
+
   const table = useReactTable({
     data: pokemon,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
     enableSortingRemoval: false,
     getPaginationRowModel: getPaginationRowModel(),
@@ -108,7 +127,9 @@ export const DataTable = () => {
     state: {
       sorting,
       pagination,
+      columnFilters: filtering,
     },
+    columnResizeMode: "onChange",
   });
 
   const { pages, showLeftEllipsis, showRightEllipsis } = usePagination({
@@ -118,8 +139,10 @@ export const DataTable = () => {
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-20">
+      <DataTableFilter table={table} />
       <div className="bg-background overflow-hidden rounded-md border">
+      
         <Table className="table-fixed">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
